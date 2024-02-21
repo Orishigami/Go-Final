@@ -31,7 +31,7 @@ func main() {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	err = database.AutoMigrate(&models.Student{}, &models.Subject{}, &models.User{})
+	err = database.AutoMigrate(&models.Student{}, &models.Subject{}, &models.User{}, &models.Teacher{})
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
@@ -39,6 +39,7 @@ func main() {
 	userRepo := models.NewUserRepository(database)
 	studentRepo := models.NewStudentRepository(database)
 	subjectRepo := models.NewSubjectRepository(database)
+	teacherRepo := models.NewTeacherRepository(database)
 
 	r := gin.Default()
 
@@ -55,22 +56,27 @@ func main() {
 	r.GET("/users", userRepo.GetUsers)
 	r.GET("/students", studentRepo.GetStudents)
 	r.GET("/subjects", subjectRepo.GetSubjects)
+	r.GET("/teacherts", teacherRepo.GetTeachers)
 
 	r.POST("/users", userRepo.PostUser)
 	r.POST("/students", studentRepo.PostStudent)
 	r.POST("/subjects", subjectRepo.PostSubject)
+	r.POST("/teacherts", teacherRepo.PostTeacher)
 
 	r.GET("/users/:email", userRepo.GetUser)
 	r.GET("/students/:id", studentRepo.GetStudent)
 	r.GET("/subjects/:id", subjectRepo.GetSubject)
+	r.GET("/teacherts/:id", teacherRepo.GetTeachers)
 
 	r.PUT("/users/:email", userRepo.UpdateUser)
 	r.PUT("/students/:id", studentRepo.UpdateStudent)
 	r.PUT("/subjects/:id", subjectRepo.UpdateSubject)
+	r.PUT("/teacherts/:id", teacherRepo.GetTeachers)
 
 	r.DELETE("/users/:email", userRepo.DeleteUser)
 	r.DELETE("/students/:id", studentRepo.DeleteStudent)
 	r.DELETE("/subjects/:id", subjectRepo.DeleteSubject)
+	r.DELETE("/teacherts/:id", teacherRepo.DeleteTeacher)
 
 	r.POST("/users/login", userRepo.Login)
 
