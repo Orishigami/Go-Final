@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/Orishigami/Go-Final/go-grom-db/db"
 	"github.com/Orishigami/Go-Final/go-grom-db/models"
-	"github.com/Orishigami/go-gorm-db/db"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -31,12 +31,14 @@ func main() {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	err = database.AutoMigrate(&models.User{})
+	err = database.AutoMigrate(&models.Student{}, &models.Subject{}, &models.User{})
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
 
 	userRepo := models.NewUserRepository(database)
+	studentRepo := models.NewStudentRepository(database)
+	subjectRepo := models.NewSubjectRepository(database)
 
 	r := gin.Default()
 
@@ -51,14 +53,24 @@ func main() {
 	}))
 
 	r.GET("/users", userRepo.GetUsers)
+	r.GET("/students", studentRepo.GetStudents)
+	r.GET("/subjects", subjectRepo.GetSubjects)
 
 	r.POST("/users", userRepo.PostUser)
+	r.POST("/students", studentRepo.PostStudent)
+	r.POST("/subjects", subjectRepo.PostSubject)
 
 	r.GET("/users/:email", userRepo.GetUser)
+	r.GET("/students/:id", studentRepo.GetStudent)
+	r.GET("/subjects/:id", subjectRepo.GetSubject)
 
 	r.PUT("/users/:email", userRepo.UpdateUser)
+	r.PUT("/students/:id", studentRepo.UpdateStudent)
+	r.PUT("/subjects/:id", subjectRepo.UpdateSubject)
 
 	r.DELETE("/users/:email", userRepo.DeleteUser)
+	r.DELETE("/students/:id", studentRepo.DeleteStudent)
+	r.DELETE("/subjects/:id", subjectRepo.DeleteSubject)
 
 	r.POST("/users/login", userRepo.Login)
 
