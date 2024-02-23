@@ -12,7 +12,7 @@ type Student struct {
 	StudentId  string `gorm:"size:9"`
 	FirstName  string
 	LastName   string
-	sex        string `gorm:"size:10"`
-	Age        int
-	bod        time.Time `gorm:"type:date"` // กำหนดชนิดข้อมูลเป็น date
+	Sex        string `gorm:"size:10"`
+	Bod        time.Time `gorm:"type:date"` // กำหนดชนิดข้อมูลเป็น date
+	Profile    string
 }

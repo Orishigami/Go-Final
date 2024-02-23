@@ -3,7 +3,7 @@ import {
   ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -11,48 +11,61 @@ import {
   Typography,
   Button,
   CardBody,
-  Chip,
   CardFooter,
   Tabs,
-  TabsHeader,
-  Tab,
   Avatar,
   IconButton,
   Tooltip,
 } from "@material-tailwind/react";
 
 function StudentList() {
+  const [students, setStudents] = useState([]);
+
+  const fetchStudents = async () => {
+    try {
+      // ทำการเรียก API ด้วย fetch ที่มี URL เป็น "http://localhost:5000/students"
+      const response = await fetch("http://localhost:5000/students");
+
+      // ตรวจสอบว่าการเรียก API สำเร็จหรือไม่
+      if (!response.ok) {
+        throw new Error(`HTTP error! status :${response.status}`);
+      }
+
+      // แปลงข้อมูลที่ได้เป็น JSON และกำหนดให้เป็นสถานะของ students
+      const data = await response.json();
+      setStudents(data); // Update the state with the fetched students data into the students array
+    } catch (error) {
+      // จัดการข้อผิดพลาดที่เกิดขึ้น และกำหนดให้เป็นสถานะของ error
+      setError(error.message);
+    } finally {
+      // ตั้งค่าสถานะ isLoading เป็น false เมื่อกระบวนการดึงข้อมูลเสร็จสิ้น
+      // setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
   return (
     <Card className="h-full w-full">
       <CardHeader floated={false} shadow={false} className="rounded-none">
         <div className="mb-8 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray">
-              Members list
+              รายชื่อนักเรียน
             </Typography>
             <Typography color="gray" className="mt-1 font-normal">
               See information about all members
             </Typography>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <Button variant="outlined" size="sm">
-              view all
-            </Button>
             <Button className="flex items-center gap-3" size="sm">
-              <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add member
+              <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> เพิ่ม
             </Button>
           </div>
         </div>
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-          <Tabs value="all" className="w-full md:w-max">
-            <TabsHeader>
-              {TABS.map(({ label, value }) => (
-                <Tab key={value} value={value}>
-                  &nbsp;&nbsp;{label}&nbsp;&nbsp;
-                </Tab>
-              ))}
-            </TabsHeader>
-          </Tabs>
+          <Tabs value="all" className="w-full md:w-max"></Tabs>
           <div className="w-full md:w-72">
             <Input
               label="Search"
@@ -65,101 +78,137 @@ function StudentList() {
         <table className="mt-4 w-full min-w-max table-auto text-left">
           <thead>
             <tr>
-              {TABLE_HEAD.map((head) => (
-                <th
-                  key={head}
-                  className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4"
+              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal leading-none opacity-70"
                 >
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-normal leading-none opacity-70"
-                  >
-                    {head}
-                  </Typography>
-                </th>
-              ))}
+                  รูป
+                </Typography>
+              </th>
+              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal leading-none opacity-70"
+                >
+                  ชื่อ
+                </Typography>
+              </th>
+              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal leading-none opacity-70"
+                >
+                  นามสกุล
+                </Typography>
+              </th>
+              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal leading-none opacity-70"
+                >
+                  เพศ
+                </Typography>
+              </th>
+              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal leading-none opacity-70"
+                >
+                  อายุ
+                </Typography>
+              </th>
+              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal leading-none opacity-70"
+                >
+                  วัน/เดือน/ปีเกิด
+                </Typography>
+              </th>
+              <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal leading-none opacity-70"
+                >
+                  ...
+                </Typography>
+              </th>
             </tr>
           </thead>
           <tbody>
-            {TABLE_ROWS.map(
-              ({ img, name, email, job, org, online, date }, index) => {
-                const isLast = index === TABLE_ROWS.length - 1;
-                const classes = isLast
-                  ? "p-4"
-                  : "p-4 border-b border-blue-gray-50";
-
-                return (
-                  <tr key={name}>
-                    <td className={classes}>
-                      <div className="flex items-center gap-3">
-                        <Avatar src={img} alt={name} size="sm" />
-                        <div className="flex flex-col">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal"
-                          >
-                            {name}
-                          </Typography>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal opacity-70"
-                          >
-                            {email}
-                          </Typography>
-                        </div>
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <div className="flex flex-col">
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {job}
-                        </Typography>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal opacity-70"
-                        >
-                          {org}
-                        </Typography>
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <div className="w-max">
-                        <Chip
-                          variant="ghost"
-                          size="sm"
-                          value={online ? "online" : "offline"}
-                          color={online ? "green" : "blue-gray"}
-                        />
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {date}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Tooltip content="Edit User">
-                        <IconButton variant="text">
-                          <PencilIcon className="h-4 w-4" />
-                        </IconButton>
-                      </Tooltip>
-                    </td>
-                  </tr>
-                );
-              }
-            )}
+            {students.map((student) => (
+              <tr key={student.ID}>
+                <td className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar src={"/images/" + student.Profile} size="sm" />
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="flex flex-col">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
+                      {student.FirstName}
+                    </Typography>
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="flex flex-col">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
+                      {student.LastName}
+                    </Typography>
+                  </div>
+                </td>
+                <td className="p-4">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-normal"
+                  >
+                    {student.Sex}
+                  </Typography>
+                </td>
+                <td className="p-4">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-normal"
+                  >
+                    {student.Age}
+                  </Typography>
+                </td>
+                <td className="p-4">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-normal"
+                  >
+                    {student.Bod.match(/\d{4}-\d{2}-\d{2}/)[0]}
+                  </Typography>
+                </td>
+                <td className="p-4">
+                  <Tooltip content="Edit User">
+                    <IconButton variant="text">
+                      <PencilIcon className="h-4 w-4" />
+                    </IconButton>
+                  </Tooltip>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </CardBody>

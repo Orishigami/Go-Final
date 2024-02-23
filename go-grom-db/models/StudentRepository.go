@@ -2,6 +2,11 @@
 package models
 
 import (
+	"net/http"
+	"path/filepath"
+	"strconv"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -32,8 +37,29 @@ func (r *StudentRepository) GetStudents(c *gin.Context) {
 // ทำหน้าที่เพิ่มข้อมูล Student ลงในฐานข้อมูล และส่งกลับไปให้ผู้ใช้งานผ่าน c.JSON(200, newStudent)
 func (r *StudentRepository) PostStudent(c *gin.Context) {
 	var newStudent Student
-	c.BindJSON(&newStudent)  // รับค่า JSON จากผู้ใช้งาน และแปลงเป็น struct ของ Student
-	r.Db.Create(&newStudent) // INSERT INTO students (name, price) VALUES (newStudent.Name, newStudent.Price)
+
+	c.BindJSON(&newStudent) // รับค่า JSON จากผู้ใช้งาน และแปลงเป็น struct ของ Student
+	// รับไฟล์รูปภาพ
+	file, err := c.FormFile("Profile")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// สร้างชื่อไฟล์ใหม่เพื่อป้องกันการทับซ้ำ
+	extension := filepath.Ext(file.Filename)
+	filename := strconv.FormatInt(time.Now().UnixNano(), 10) + extension
+
+	// บันทึกไฟล์รูปภาพ
+	destination := "C:/works/subject/2566 2/CIT3518 Network Programming/Go-Final/go-react/public/images/" + filename
+	if err := c.SaveUploadedFile(file, destination); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// กำหนด URL ของรูปภาพให้กับ Student
+	newStudent.Profile = filename
+
+	r.Db.Create(&newStudent) // INSERT INTO students
 	c.JSON(200, newStudent)  // ส่งข้อมูลกลับไปให้ผู้ใช้งาน
 }
 
