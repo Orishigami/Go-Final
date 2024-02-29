@@ -14,6 +14,9 @@ import {
   IconButton,
   Tooltip,
 } from "@material-tailwind/react";
+import { NavLink } from "react-router-dom";
+import TeacherUpdate from "./Update";
+import TeacherDelete from "./Delete";
 
 function TeacherList() {
   const [teachers, setTeachers] = useState([]);
@@ -57,13 +60,15 @@ function TeacherList() {
               </Typography>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button className="flex items-center gap-3" size="sm">
-                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> เพิ่ม
-              </Button>
+              <NavLink to="/teacherinsert">
+                <Button className="flex items-center gap-3" size="sm">
+                  <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> เพิ่ม
+                </Button>
+              </NavLink>
             </div>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <Tabs value="all" className="w-full md:w-max"></Tabs>
+            {/* <Tabs value="all" className="w-full md:w-max"></Tabs> */}
             <div className="w-full md:w-72">
               <Input
                 label="Search"
@@ -172,14 +177,10 @@ function TeacherList() {
                   </td>
                   <td className="p-4">
                     <Tooltip content="Edit User">
-                      <IconButton variant="text">
-                        <PencilIcon className="h-4 w-4" />
-                      </IconButton>
+                      <TeacherUpdate teacher={teacher} />
                     </Tooltip>
                     <Tooltip>
-                      <IconButton variant="text">
-                        <TrashIcon className="h-4 w-4" />
-                      </IconButton>
+                      <TeacherDelete teacher={teacher} />
                     </Tooltip>
                   </td>
                 </tr>

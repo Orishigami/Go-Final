@@ -71,7 +71,7 @@ func main() {
 	r.PUT("/users/:email", userRepo.UpdateUser)
 	r.PUT("/students/:id", studentRepo.UpdateStudent)
 	r.PUT("/subjects/:id", subjectRepo.UpdateSubject)
-	r.PUT("/teachers/:id", teacherRepo.GetTeachers)
+	r.PUT("/teachers/:id", teacherRepo.UpdateTeacher)
 
 	r.DELETE("/users/:email", userRepo.DeleteUser)
 	r.DELETE("/students/:id", studentRepo.DeleteStudent)
